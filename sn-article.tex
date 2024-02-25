@@ -143,14 +143,46 @@ Based on Wagner's paper, we make the hyper parameters $\boldsymbol{w}_{k}$ as a 
         \Sigma_{ij} = \sigma_{i}\sigma_{j}R \\
         \end{equation}
         \begin{equation}
-           \boldsymbol{\sigma} = (\sigma_1,...,\sigma_N) \\ 
+           \boldsymbol{\sigma} = (\sigma_1,...,\sigma_{101}) \\ 
         \end{equation}
 \begin{equation}
-    y = max(\mathcal{Y}_{obs})
+    y_{j} = max(\mathcal{Y}_{obs\_j})
 \end{equation}
         \begin{equation}
-\sigma_{i} = \sum_{k=0}^{6} \omega_{k} \times \psi_{k} \times y
+\sigma_{i} = \sum_{k=0}^{6} \omega_{k} \times \psi_{k} \times y_{j}; i = \{1,\cdots,101\}
         \end{equation}
 
-in which, $\mathcal{Y}_{obs}$ is observation in different stages. In this way, the only prior we need to control is now only normalized $\boldsymbol{w}_{k}$ without units.
+in which, $\mathcal{Y}_{obs\_j}$ is observation for  loading stage  $j$; $\mathcal{Y}_{obs\_j} = \{ y_1,y_2,...,y_{101}\}$; for example, $\mathcal{Y}_{obs} = \{\mathcal{Y}_{obs\_1},...,\mathcal{Y}_{obs\_9}  \}$ for 9 loading stages, $R$ is constant as 1 not considering non-diagonal effect.
+
+In this way, the only prior we need to control is now only normalized $\boldsymbol{w}_{k}$ without units.
+
+
+\begin{algorithm}
+    \caption{Gaussian type observation error} \label{alg:loglikelihood}
+
+\KwData{hyperparams prior $\boldsymbol{w}$; observations $\mathcal{Y}_{obs}$}
+\KwResult{Observation erro covariance $\boldsymbol{\Sigma}$}
+
+Initialization\; 
+
+$E \gets params(:,1); \delta \gets params(:,2); \epsilon \gets params(:,3)$; \# Array of variables from $params$ \; 
+
+$Nchain \gets$ Number of rows from $params$, i.e., MCMC chains \; 
+
+$Nexp \gets$  Number of rows from $Y$, i.e., number of experiments \; 
+
+\For{$i \gets 1 \ to  \ Nchain$}{
+
+    \For{$ j \gets 1 \ to \ Nexp$}{
+    $\Delta \ell{\mathcal{L}}(i,j)$ = $-\frac{1}{2}\left(\boldsymbol{Y(i,j)} - \mathcal{M}(\vec\theta)\right)^{\mathsf{T}} \boldsymbol{\Sigma}^{-1}(\epsilon)\left(\boldsymbol{Y(i,j)} - \mathcal{M}(\vec\theta)\right) 
+    - \frac{1}   {2}\ell\det((\boldsymbol{\Sigma}(\epsilon))$\;
+
+ $\ell{\mathcal{L}}(i)$ $\gets$  $\ell{\mathcal{L}}(i)$+ $\Delta \ell{\mathcal{L}}(i,j)$ \;
+    $j = j +1$;\
+}
+    $i = i +1$
+}
+
+\end{algorithm}
+
 \end{document}
